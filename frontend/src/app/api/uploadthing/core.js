@@ -8,7 +8,7 @@ export const ourFileRouter = {
       return {};
     })
     .onUploadComplete(async ({ file }) => {
-      return { url: file.url };
+      return { url: file.ufsUrl };
     }),
 
   avatarImage: f({ image: { maxFileSize: '2MB', maxFileCount: 1 } })
@@ -16,6 +16,6 @@ export const ourFileRouter = {
       return {};
     })
     .onUploadComplete(async ({ file }) => {
-      return { url: file.url };
+      return { url: file.ufsUrl };
     }),
 };
