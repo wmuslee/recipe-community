@@ -1,6 +1,8 @@
 import { createUploadthing } from 'uploadthing/next';
 
-const f = createUploadthing();
+const f = createUploadthing({
+  token: process.env.UPLOADTHING_TOKEN,
+});
 
 export const ourFileRouter = {
   recipeImage: f({ image: { maxFileSize: '4MB', maxFileCount: 1 } })
@@ -8,7 +10,6 @@ export const ourFileRouter = {
       return {};
     })
     .onUploadComplete(async ({ file }) => {
-      console.log('Recipe image uploaded:', file.ufsUrl);
       return { url: file.ufsUrl };
     }),
 
@@ -17,7 +18,6 @@ export const ourFileRouter = {
       return {};
     })
     .onUploadComplete(async ({ file }) => {
-      console.log('Avatar uploaded:', file.ufsUrl);
       return { url: file.ufsUrl };
     }),
 };
