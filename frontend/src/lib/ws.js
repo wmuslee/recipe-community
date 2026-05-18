@@ -15,13 +15,20 @@ export function useRecipeWS({ recipeId, onCommentAdded, onCommentDeleted, onOnli
 
       ws.current.onopen = () => {
         const token = localStorage.getItem('rc_token');
-        if (token) ws.current.send(JSON.stringify({ type: 'AUTH', token }));
-        ws.current.send(JSON.stringify({ type: 'JOIN_RECIPE', recipeId }));
+        if (token) {
+          ws.current.send(JSON.stringify({ type: 'AUTH', token }));
+        } else {
+          ws.current.send(JSON.stringify({ type: 'JOIN_RECIPE', recipeId }));
+        }
       };
 
       ws.current.onmessage = (e) => {
         try {
           const msg = JSON.parse(e.data);
+          if (msg.type === 'AUTH_OK') {
+            ws.current.send(JSON.stringify({ type: 'JOIN_RECIPE', recipeId }));
+            return;
+          }
           if (msg.type === 'COMMENT_ADDED') onCommentAdded?.(msg.comment);
           if (msg.type === 'COMMENT_DELETED') onCommentDeleted?.(msg.commentId);
           if (msg.type === 'ONLINE_USERS') onOnlineUsers?.(msg.users, msg.count);
@@ -39,13 +46,20 @@ export function useRecipeWS({ recipeId, onCommentAdded, onCommentDeleted, onOnli
   useEffect(() => {
     connect();
 
-    return () => {
-      clearTimeout(timer.current);
-      // Проверяем что соединение открыто перед отправкой
+    const handleUnload = () => {
       if (ws.current?.readyState === WebSocket.OPEN) {
         ws.current.send(JSON.stringify({ type: 'LEAVE_RECIPE', recipeId }));
       }
-      ws.current?.close();
+    };
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      clearTimeout(timer.current);
+      window.removeEventListener('beforeunload', handleUnload);
+      if (ws.current?.readyState === WebSocket.OPEN) {
+        ws.current.send(JSON.stringify({ type: 'LEAVE_RECIPE', recipeId }));
+        ws.current.close();
+      }
     };
   }, [connect, recipeId]);
 

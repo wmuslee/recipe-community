@@ -25,6 +25,12 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
   const onCommentDeleted = useCallback(id => setComments(prev => prev.filter(c => c._id !== id)), []);
   const onOnlineUsers = useCallback((users, count) => { setOnline(users); setOnlineCount(count); }, []);
 
+  useEffect(() => {
+  return () => {
+    console.log('Leaving recipe room:', recipeId);
+  };
+}, [recipeId]);
+
   const { broadcastNewComment, broadcastDeleteComment } = useRecipeWS({
     recipeId, onCommentAdded, onCommentDeleted, onOnlineUsers,
   });
