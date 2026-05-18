@@ -3,7 +3,7 @@ import { useEffect, useRef, useCallback } from 'react';
 
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:5000';
 
-export function useRecipeWS({ recipeId, onCommentAdded, onCommentDeleted, onOnlineUsers }) {
+export function useRecipeWS({ recipeId, onCommentAdded, onCommentDeleted, onOnlineUsers, onCommentUpdated, onCommentLiked }) {
   const ws = useRef(null);
   const timer = useRef(null);
 
@@ -32,6 +32,8 @@ export function useRecipeWS({ recipeId, onCommentAdded, onCommentDeleted, onOnli
           if (msg.type === 'COMMENT_ADDED') onCommentAdded?.(msg.comment);
           if (msg.type === 'COMMENT_DELETED') onCommentDeleted?.(msg.commentId);
           if (msg.type === 'ONLINE_USERS') onOnlineUsers?.(msg.users, msg.count);
+          if (msg.type === 'COMMENT_UPDATED') onCommentUpdated?.(msg.comment);
+          if (msg.type === 'COMMENT_LIKED') onCommentLiked?.(msg.commentId, msg.likesCount, msg.isLiked, msg.userId);
         } catch {}
       };
 
@@ -41,7 +43,7 @@ export function useRecipeWS({ recipeId, onCommentAdded, onCommentDeleted, onOnli
 
       ws.current.onerror = () => ws.current?.close();
     } catch {}
-  }, [recipeId, onCommentAdded, onCommentDeleted, onOnlineUsers]);
+  }, [recipeId, onCommentAdded, onCommentDeleted, onOnlineUsers, onCommentUpdated, onCommentLiked]);
 
   useEffect(() => {
     connect();
@@ -73,5 +75,15 @@ export function useRecipeWS({ recipeId, onCommentAdded, onCommentDeleted, onOnli
       ws.current.send(JSON.stringify({ type: 'DELETE_COMMENT', commentId }));
   }, []);
 
-  return { broadcastNewComment, broadcastDeleteComment };
+  const broadcastUpdateComment = useCallback((comment) => {
+    if (ws.current?.readyState === WebSocket.OPEN)
+      ws.current.send(JSON.stringify({ type: 'UPDATE_COMMENT', comment }));
+  }, []);
+
+  const broadcastLikeComment = useCallback((commentId, likesCount, isLiked, userId) => {
+    if (ws.current?.readyState === WebSocket.OPEN)
+      ws.current.send(JSON.stringify({ type: 'LIKE_COMMENT', commentId, likesCount, isLiked, userId }));
+  }, []);
+
+  return { broadcastNewComment, broadcastDeleteComment, broadcastUpdateComment, broadcastLikeComment };
 }

@@ -63,9 +63,35 @@ function initWS(server) {
           break;
         }
 
+
+        case 'UPDATE_COMMENT': {
+          if (ws._room) {
+            broadcastRoom(ws._room, {
+              type: 'COMMENT_UPDATED',
+              comment: msg.comment,
+            });
+          }
+          break;
+        }
+
+        case 'LIKE_COMMENT': {
+          if (ws._room) {
+            broadcastRoom(ws._room, {
+              type: 'COMMENT_LIKED',
+              commentId: msg.commentId,
+              likesCount: msg.likesCount,
+              isLiked: msg.isLiked,
+              userId: msg.userId,
+            });
+          }
+          break;
+        }
+
         case 'PING':
           if (ws.readyState === 1) ws.send(JSON.stringify({ type: 'PONG' }));
           break;
+
+
       }
     });
 
