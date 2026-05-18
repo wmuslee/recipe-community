@@ -2,15 +2,36 @@ const { WebSocketServer } = require('ws');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// rooms: recipeId => Set of ws clients
 const rooms = new Map();
 
 function initWS(server) {
   const wss = new WebSocketServer({ server, path: '/ws' });
 
+  // Heartbeat — каждые 30 секунд проверяем живые соединения
+  const heartbeatInterval = setInterval(() => {
+    wss.clients.forEach((ws) => {
+      if (ws.isAlive === false) {
+        // Соединение мёртвое — удаляем из комнаты
+        if (ws._room && rooms.has(ws._room)) {
+          rooms.get(ws._room).delete(ws);
+          broadcastOnline(ws._room);
+        }
+        return ws.terminate();
+      }
+      ws.isAlive = false;
+      ws.ping();
+    });
+  }, 30000);
+
+  wss.on('close', () => clearInterval(heartbeatInterval));
+
   wss.on('connection', (ws) => {
     ws._user = null;
     ws._room = null;
+    ws.isAlive = true; // помечаем как живое
+
+    // Когда клиент отвечает на ping — он живой
+    ws.on('pong', () => { ws.isAlive = true; });
 
     ws.on('message', async (raw) => {
       let msg;
@@ -28,7 +49,6 @@ function initWS(server) {
         }
 
         case 'JOIN_RECIPE': {
-          // Leave previous room
           if (ws._room && rooms.has(ws._room)) {
             rooms.get(ws._room).delete(ws);
             broadcastOnline(ws._room);
@@ -63,13 +83,9 @@ function initWS(server) {
           break;
         }
 
-
         case 'UPDATE_COMMENT': {
           if (ws._room) {
-            broadcastRoom(ws._room, {
-              type: 'COMMENT_UPDATED',
-              comment: msg.comment,
-            });
+            broadcastRoom(ws._room, { type: 'COMMENT_UPDATED', comment: msg.comment });
           }
           break;
         }
@@ -90,12 +106,11 @@ function initWS(server) {
         case 'PING':
           if (ws.readyState === 1) ws.send(JSON.stringify({ type: 'PONG' }));
           break;
-
-
       }
     });
 
     ws.on('close', () => {
+      ws.isAlive = false;
       if (ws._room && rooms.has(ws._room)) {
         rooms.get(ws._room).delete(ws);
         broadcastOnline(ws._room);
@@ -121,12 +136,19 @@ function broadcastOnline(recipeId) {
   if (!rooms.has(recipeId)) return;
   const clients = rooms.get(recipeId);
   const users = [];
+
   for (const c of clients) {
     if (c.readyState === 1 && c._user) users.push(c._user);
   }
-  // Deduplicate by _id
+
+  // Убираем дубликаты по _id
   const unique = users.filter((u, i, s) => i === s.findIndex((x) => x._id === u._id));
-  broadcastRoom(recipeId, { type: 'ONLINE_USERS', users: unique, count: clients.size });
+
+  broadcastRoom(recipeId, {
+    type: 'ONLINE_USERS',
+    users: unique,
+    count: unique.length, // показываем уникальных юзеров а не все соединения
+  });
 }
 
 module.exports = { initWS, broadcastRoom };
