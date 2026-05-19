@@ -11,7 +11,7 @@ export default function EditRecipePage({ params }) {
   const router = useRouter();
   const { id } = params;
 
-  const [cats, setCats] = useState([]);
+  const [cats, setCats] = useState([]);  //
   const [allTags, setAllTags] = useState([]);
   const [image, setImage] = useState('');
   const [form, setForm] = useState(null);
@@ -20,8 +20,10 @@ export default function EditRecipePage({ params }) {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // перенаправление на страницу входа, если пользователь не авторизован
   useEffect(() => { if (!loading && !user) router.push('/auth/login'); }, [user, loading, router]);
 
+  // загрузка данных рецепта, категорий и тегов при монтировании
   useEffect(() => {
     if (!id) return;
     Promise.all([recipesAPI.getOne(id), categoriesAPI.getAll(), tagsAPI.getAll()])
@@ -39,14 +41,15 @@ export default function EditRecipePage({ params }) {
       }).catch(() => router.push('/recipes'));
   }, [id, router]);
 
-  const addIng = () => setIngs(p => [...p, { name:'', amount:'', unit:'' }]);
-  const rmIng = i => setIngs(p => p.filter((_,j)=>j!==i));
-  const upIng = (i,f,v) => setIngs(p => p.map((x,j) => j===i?{...x,[f]:v}:x));
-  const addStep = () => setSteps(p => [...p, { step:p.length+1, text:'' }]);
-  const rmStep = i => setSteps(p => p.filter((_,j)=>j!==i).map((s,j)=>({...s,step:j+1})));
-  const upStep = (i,v) => setSteps(p => p.map((x,j) => j===i?{...x,text:v}:x));
-  const toggleTag = tid => setForm(f => ({ ...f, tags: f.tags.includes(tid)?f.tags.filter(x=>x!==tid):[...f.tags,tid] }));
+  const addIng = () => setIngs(p => [...p, { name:'', amount:'', unit:'' }]); // добавление ингредиента
+  const rmIng = i => setIngs(p => p.filter((_,j)=>j!==i)); // удаление ингредиента
+  const upIng = (i,f,v) => setIngs(p => p.map((x,j) => j===i?{...x,[f]:v}:x)); // обновление поля ингредиента
+  const addStep = () => setSteps(p => [...p, { step:p.length+1, text:'' }]); // добавление шага
+  const rmStep = i => setSteps(p => p.filter((_,j)=>j!==i).map((s,j)=>({...s,step:j+1})));  // удаление шага и перенумерация
+  const upStep = (i,v) => setSteps(p => p.map((x,j) => j===i?{...x,text:v}:x)); // обновление текста шага
+  const toggleTag = tid => setForm(f => ({ ...f, tags: f.tags.includes(tid)?f.tags.filter(x=>x!==tid):[...f.tags,tid] }));  // добавление/удаление тега
 
+  // обработчик отправки формы для сохранения изменений рецепта
   const onSubmit = async e => {
     e.preventDefault(); setError(''); setSaving(true);
     try {

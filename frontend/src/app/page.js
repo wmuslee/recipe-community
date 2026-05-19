@@ -3,6 +3,7 @@ import styles from './page.module.css';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+// функция для получения популярных рецептов
 async function getFeatured() {
   try {
     const r = await fetch(`${API}/api/recipes?sort=popular&limit=6`, { next: { revalidate: 60 } });
@@ -11,6 +12,7 @@ async function getFeatured() {
   } catch { return []; }
 }
 
+// функция для получения категорий
 async function getCategories() {
   try {
     const r = await fetch(`${API}/api/categories`, { next: { revalidate: 300 } });
@@ -19,6 +21,7 @@ async function getCategories() {
   } catch { return []; }
 }
 
+// главная страница категориями и популярными рецептами
 export default async function HomePage() {
   const [recipes, categories] = await Promise.all([getFeatured(), getCategories()]);
 

@@ -12,8 +12,10 @@ export default function RegisterPage() {
   const { register } = useAuth();
   const router = useRouter();
 
+  // обработчик изменения полей формы
   const onChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
+  // обработчик отправки формы
   const onSubmit = async e => {
     e.preventDefault();
     if (form.password.length < 6) return setError('Password must be at least 6 characters');

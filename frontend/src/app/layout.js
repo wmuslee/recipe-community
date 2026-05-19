@@ -2,6 +2,7 @@ import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import Navbar from '@/components/Navbar/Navbar';
 
+// метаданные для отображения в браузере
 export const metadata = {
   title: 'Recipe Community — Share Your Culinary World',
   description: 'Discover, share and save amazing recipes. A social platform for food lovers.',

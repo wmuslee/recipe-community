@@ -17,6 +17,7 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // перенаправление на страницу входа, если пользователь не авторизован
   useEffect(() => { if (!loading && !user) router.push('/auth/login'); }, [user, loading, router]);
   useEffect(() => {
     if (user) {
@@ -25,6 +26,7 @@ export default function ProfilePage() {
     }
   }, [user]);
 
+  // сохранение изменений профиля
   const save = async e => {
     e.preventDefault(); setSaving(true); setError('');
     try {
@@ -35,6 +37,7 @@ export default function ProfilePage() {
     finally { setSaving(false); }
   };
 
+  // удаление рецепта
   const delRecipe = async id => {
     if (!confirm('Delete this recipe?')) return;
     try { await recipesAPI.delete(id); setMyRecipes(p=>p.filter(r=>r._id!==id)); }

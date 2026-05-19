@@ -9,7 +9,7 @@ const populate = (q) =>
    .populate('category', 'name slug color icon')
    .populate('tags', 'name color slug');
 
-// GET /api/recipes  — list with search + filters + pagination
+// GET /api/recipes с поддержкой фильтров, сортировки и пагинации, если в запросе есть токен - добавляем информацию о том, лайкнул ли юзер рецепт и сохранил ли он его
 router.get('/', optionalAuth, async (req, res) => {
   try {
     const { search, category, tag, difficulty, maxTime, sort = 'newest', page = 1, limit = 12 } = req.query;
@@ -39,7 +39,7 @@ router.get('/', optionalAuth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// GET /api/recipes/user/:userId
+// GET /api/recipes/user/:userId отдаем все рецепты пользователя, сортируем по дате создания (новые первыми), добавляем данные авторов рецептов (username и avatar)
 router.get('/user/:userId', async (req, res) => {
   try {
     const recipes = await populate(Recipe.find({ author: req.params.userId })).sort({ createdAt: -1 });
@@ -47,7 +47,7 @@ router.get('/user/:userId', async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// GET /api/recipes/:id
+// GET /api/recipes/:id отдаем рецепт по id, если в запросе есть токен - добавляем информацию о том, лайкнул ли юзер рецепт и сохранил ли он его, +1
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
     const recipe = await populate(Recipe.findById(req.params.id));
@@ -57,7 +57,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// POST /api/recipes
+// POST /api/recipes для авторизованных юзеров, создаем рецепт, отдаем его, если в запросе есть теги - +1
 router.post('/', protect, async (req, res) => {
   try {
     const { title, description, ingredients, instructions, cookingTime, servings, difficulty, image, category, tags } = req.body;
@@ -68,7 +68,7 @@ router.post('/', protect, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// PUT /api/recipes/:id
+// PUT /api/recipes/:id для авторов рецептов, обновляем рецепт, отдаем обновленный рецепт
 router.put('/:id', protect, async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -85,7 +85,7 @@ router.put('/:id', protect, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// DELETE /api/recipes/:id
+// DELETE /api/recipes/:id для авторов рецептов и админов, удаляем рецепт, отдаем сообщение об удалении, если в запросе есть теги - -1
 router.delete('/:id', protect, async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -97,7 +97,7 @@ router.delete('/:id', protect, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// POST /api/recipes/:id/like
+// POST /api/recipes/:id/like для авторизованных юзеров, если юзер уже лайкнул рецепт - убираем лайк, если не лайкнул - ставим лайк, отдаем количество лайков и флаг, поставил ли юзер лайк
 router.post('/:id/like', protect, async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -111,7 +111,7 @@ router.post('/:id/like', protect, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// POST /api/recipes/:id/save
+// POST /api/recipes/:id/save для авторизованных юзеров, если юзер уже сохранил рецепт - убираем из сохраненных, если не сохранил - добавляем в сохраненные, отдаем флаг, сохранил ли юзер рецепт
 router.post('/:id/save', protect, async (req, res) => {
   try {
     const User = require('../models/User');

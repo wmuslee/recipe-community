@@ -3,11 +3,13 @@ const router = express.Router();
 const Tag = require('../models/Tag');
 const { protect } = require('../middleware/protect');
 
+// GET /api/tags  отдаем все теги, сортируем по количеству использования (usageCount)
 router.get('/', async (req, res) => {
   try { res.json(await Tag.find().sort({ usageCount: -1 })); }
   catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+// POST /api/tags/  для авторизованных юзеров, создаем тег, отдаем его, если тег с таким slug уже существует - отдаем существующий тег, если в запросе нет цвета - ставим цвет по умолчанию
 router.post('/', protect, async (req, res) => {
   try {
     const { name, color } = req.body;

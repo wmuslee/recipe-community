@@ -1,7 +1,8 @@
 import { createUploadthing } from 'uploadthing/next';
 
-const f = createUploadthing();
 
+const f = createUploadthing();
+// экспортируем роутер для загрузки изображений
 export const ourFileRouter = {
   recipeImage: f({ image: { maxFileSize: '4MB', maxFileCount: 1 } })
     .middleware(async () => {
@@ -10,7 +11,7 @@ export const ourFileRouter = {
     .onUploadComplete(async ({ file }) => {
       return { url: file.ufsUrl };
     }),
-
+  // роутер для загрузки аватаров
   avatarImage: f({ image: { maxFileSize: '2MB', maxFileCount: 1 } })
     .middleware(async () => {
       return {};

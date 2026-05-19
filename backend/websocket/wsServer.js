@@ -2,7 +2,7 @@ const { WebSocketServer } = require('ws');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// rooms: recipeId => Set of ws clients
+// реализация WebSocket сервера для поддержки онлайн-статуса и комментариев в реальном времени на странице рецепта
 const rooms = new Map();
 
 function initWS(server) {

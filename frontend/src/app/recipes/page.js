@@ -13,11 +13,14 @@ export default function RecipesPage() {
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({ search: '', category: '', difficulty: '', maxTime: '', tag: '', sort: 'newest' });
 
+  // функция для получения списка рецептов с учетом текущих фильтров и пагинации
   const fetchRecipes = useCallback(async (pg = 1) => {
     setLoading(true);
     try {
+      // формирование параметров запроса на основе фильтров и страницы
       const p = { page: pg, limit: 12 };
       Object.entries(filters).forEach(([k, v]) => { if (v) p[k] = v; });
+      // запрос к API для получения рецептов и обновление состояния с результатами и информацией о пагинации
       const data = await recipesAPI.getAll(p);
       setRecipes(data.recipes || []);
       setTotalPages(data.totalPages || 1);
@@ -26,12 +29,14 @@ export default function RecipesPage() {
     finally { setLoading(false); }
   }, [filters]);
 
+  // загрузка рецептов при изменении фильтров или страницы 
   useEffect(() => { fetchRecipes(1); }, [fetchRecipes]);
   useEffect(() => {
     Promise.all([categoriesAPI.getAll(), tagsAPI.getAll()])
       .then(([c, t]) => { setCats(c); setTags(t); }).catch(() => {});
   }, []);
 
+  // функции для обновления отдельных фильтров, очистки всех фильтров и проверки наличия активных фильтров
   const set = (k, v) => setFilters(f => ({ ...f, [k]: v }));
   const clear = () => setFilters({ search: '', category: '', difficulty: '', maxTime: '', tag: '', sort: 'newest' });
   const hasFilter = Object.entries(filters).some(([k, v]) => v && k !== 'sort');

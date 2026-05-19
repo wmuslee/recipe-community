@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// проверяем наличие JWT токена, добавляем юзера в req.user
 const protect = async (req, res, next) => {
   let token;
   if (req.headers.authorization?.startsWith('Bearer')) {
@@ -19,6 +20,7 @@ const protect = async (req, res, next) => {
   }
 };
 
+//достаем токен, если он есть, добавляем юзера в req, иначе просто продолжаем
 const optionalAuth = async (req, res, next) => {
   let token;
   if (req.headers.authorization?.startsWith('Bearer')) {

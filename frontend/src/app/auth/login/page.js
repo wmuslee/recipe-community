@@ -11,11 +11,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
-
+  
+  // обработчик изменения полей формы
   const onChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-
+  
+  // обработчик отправки формы
   const onSubmit = async e => {
-    e.preventDefault();
+    e.preventDefault(); 
     setError(''); setLoading(true);
     try { await login(form.email, form.password); router.push('/'); }
     catch (err) { setError(err.message || 'Login failed'); }

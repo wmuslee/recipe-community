@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+// API URL из переменных окружения
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+// функция для получения данных пользователя по ID
 async function getUser(id) {
   try {
     const r = await fetch(`${API}/api/users/${id}`, { next: { revalidate: 60 } });
@@ -11,6 +13,7 @@ async function getUser(id) {
   } catch { return null; }
 }
 
+// функция для получения рецептов пользователя по ID
 async function getUserRecipes(id) {
   try {
     const r = await fetch(`${API}/api/recipes/user/${id}`, { next: { revalidate: 60 } });
@@ -19,6 +22,7 @@ async function getUserRecipes(id) {
   } catch { return []; }
 }
 
+// страница публичного профиля пользователя с его рецептами
 export default async function PublicProfilePage({ params }) {
   const [user, recipes] = await Promise.all([getUser(params.userId), getUserRecipes(params.userId)]);
   if (!user) notFound();

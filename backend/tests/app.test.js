@@ -11,7 +11,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const request = require('supertest');
 
-// ── 1. Unit: generateToken ─────────────────────────────────────────────────
+// ── 1. Unit: generateToken
 describe('Utils › generateToken', () => {
   const { generateToken, verifyToken } = require('../utils/generateToken');
 
@@ -34,7 +34,7 @@ describe('Utils › generateToken', () => {
   });
 });
 
-// ── 2. Unit: bcrypt helpers ────────────────────────────────────────────────
+// ── 2. Unit: bcrypt helpers 
 describe('Utils › bcrypt password hashing', () => {
   test('hashed password differs from plaintext', async () => {
     const plain = 'MySecret123';
@@ -54,7 +54,7 @@ describe('Utils › bcrypt password hashing', () => {
   });
 });
 
-// ── 3. Unit: User model validation ────────────────────────────────────────
+// ── 3. Unit: User model validation 
 describe('Model › User validation', () => {
   const User = require('../models/User');
 
@@ -81,7 +81,7 @@ describe('Model › User validation', () => {
   });
 });
 
-// ── 4. Unit: Recipe model validation ──────────────────────────────────────
+// ── 4. Unit: Recipe model validation 
 describe('Model › Recipe validation', () => {
   const Recipe = require('../models/Recipe');
 
@@ -101,7 +101,7 @@ describe('Model › Recipe validation', () => {
   });
 });
 
-// ── 5. Unit: Comment model validation ─────────────────────────────────────
+// ── 5. Unit: Comment model validation 
 describe('Model › Comment validation', () => {
   const Comment = require('../models/Comment');
 
@@ -121,7 +121,7 @@ describe('Model › Comment validation', () => {
   });
 });
 
-// ── 6. Unit: Tag model validation ─────────────────────────────────────────
+// ── 6. Unit: Tag model validation 
 describe('Model › Tag validation', () => {
   const Tag = require('../models/Tag');
 
@@ -136,7 +136,7 @@ describe('Model › Tag validation', () => {
   });
 });
 
-// ── 7. Unit: protect middleware ────────────────────────────────────────────
+// ── 7. Unit: protect middleware 
 describe('Middleware › protect', () => {
   const { protect } = require('../middleware/protect');
 
@@ -163,7 +163,7 @@ describe('Middleware › protect', () => {
   });
 });
 
-// ── 8. Integration: health check ──────────────────────────────────────────
+// ── 8. Integration: health check 
 describe('API › Health check', () => {
   const app = require('../app');
 
@@ -179,7 +179,7 @@ describe('API › Health check', () => {
   });
 });
 
-// ── 9. Integration: Auth routes ────────────────────────────────────────────
+// ── 9. Integration: Auth routes 
 describe('API › Auth routes', () => {
   const app = require('../app');
 
@@ -200,7 +200,7 @@ describe('API › Auth routes', () => {
   });
 });
 
-// ── 10. Integration: Recipe routes ─────────────────────────────────────────
+// ── 10. Integration: Recipe routes 
 describe('API › Recipe routes', () => {
   const app = require('../app');
 
@@ -220,7 +220,7 @@ describe('API › Recipe routes', () => {
   });
 });
 
-// ── 11. Integration: Comment routes ────────────────────────────────────────
+// ── 11. Integration: Comment routes 
 describe('API › Comment routes', () => {
   const app = require('../app');
 

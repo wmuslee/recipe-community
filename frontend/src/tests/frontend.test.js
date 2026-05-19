@@ -8,7 +8,7 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
   usePathname: () => '/',
 }));
-
+// 
 jest.mock('@/lib/api', () => ({
   authAPI: { me: jest.fn(), login: jest.fn(), register: jest.fn(), updateProfile: jest.fn() },
   recipesAPI: { getAll: jest.fn(), getOne: jest.fn(), create: jest.fn(), delete: jest.fn(), like: jest.fn(), save: jest.fn(), byUser: jest.fn() },

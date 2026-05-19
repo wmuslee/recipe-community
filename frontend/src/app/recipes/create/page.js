@@ -18,20 +18,23 @@ export default function CreateRecipePage() {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // перенаправление на страницу входа, если пользователь не авторизован
   useEffect(() => { if (!loading && !user) router.push('/auth/login'); }, [user, loading, router]);
+  // загрузка категорий и тегов при монтировании
   useEffect(() => {
     Promise.all([categoriesAPI.getAll(), tagsAPI.getAll()])
       .then(([c,t]) => { setCats(c); setAllTags(t); }).catch(()=>{});
   }, []);
 
-  const addIng = () => setIngs(p => [...p, { name:'', amount:'', unit:'' }]);
-  const rmIng = i => setIngs(p => p.filter((_,j)=>j!==i));
-  const upIng = (i,f,v) => setIngs(p => p.map((x,j) => j===i?{...x,[f]:v}:x));
-  const addStep = () => setSteps(p => [...p, { step:p.length+1, text:'' }]);
-  const rmStep = i => setSteps(p => p.filter((_,j)=>j!==i).map((s,j)=>({...s,step:j+1})));
-  const upStep = (i,v) => setSteps(p => p.map((x,j) => j===i?{...x,text:v}:x));
-  const toggleTag = id => setForm(f => ({ ...f, tags: f.tags.includes(id)?f.tags.filter(t=>t!==id):[...f.tags,id] }));
+  const addIng = () => setIngs(p => [...p, { name:'', amount:'', unit:'' }]); // добавление ингредиента
+  const rmIng = i => setIngs(p => p.filter((_,j)=>j!==i)); // удаление ингредиента
+  const upIng = (i,f,v) => setIngs(p => p.map((x,j) => j===i?{...x,[f]:v}:x)); // обновление поля ингредиента
+  const addStep = () => setSteps(p => [...p, { step:p.length+1, text:'' }]); // добавление шага
+  const rmStep = i => setSteps(p => p.filter((_,j)=>j!==i).map((s,j)=>({...s,step:j+1}))); // удаление шага и перенумерация
+  const upStep = (i,v) => setSteps(p => p.map((x,j) => j===i?{...x,text:v}:x)); // обновление текста шага
+  const toggleTag = id => setForm(f => ({ ...f, tags: f.tags.includes(id)?f.tags.filter(t=>t!==id):[...f.tags,id] })); // добавление/удаление тега
 
+  // обработчик отправки формы для создания нового рецепта
   const onSubmit = async e => {
     e.preventDefault();
     setError('');
@@ -40,6 +43,7 @@ export default function CreateRecipePage() {
     if (steps.some(s=>!s.text)) return setError('All steps need text');
     setSaving(true);
     try {
+      // создание рецепта через API и перенаправление на страницу нового рецепта
       const recipe = await recipesAPI.create({ ...form, cookingTime:+form.cookingTime, servings:+form.servings, ingredients:ings, instructions:steps, image });
       router.push(`/recipes/${recipe._id}`);
     } catch(err){ setError(err.message||'Failed to create recipe'); }

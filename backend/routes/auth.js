@@ -4,7 +4,7 @@ const User = require('../models/User');
 const { generateToken } = require('../utils/generateToken');
 const { protect } = require('../middleware/protect');
 
-// POST /api/auth/register
+// POST /api/auth/register  проверка на поля, если все гуд - создаем юзера, генерируем токен и отдаем юзера с токеном
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -23,7 +23,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// POST /api/auth/login
+// POST /api/auth/login проверка на поля, если все гуд - ищем юзера по email, если юзер найден и пароль совпал - генерируем токен и отдаем юзера с токеном
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -41,7 +41,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET /api/auth/me
+// GET /api/auth/me только для авторизованных юзеров, отдаем данные юзера, включая сохраненные рецепты
 router.get('/me', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate('savedRecipes', 'title image');
@@ -51,7 +51,7 @@ router.get('/me', protect, async (req, res) => {
   }
 });
 
-// PUT /api/auth/profile
+// PUT /api/auth/profile для авторизованных юзеров, обновляем данные юзера, если в запросе есть пароль - обновляем пароль
 router.put('/profile', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);

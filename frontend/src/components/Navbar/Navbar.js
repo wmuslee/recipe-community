@@ -13,14 +13,17 @@ export default function Navbar() {
   const [mob, setMob] = useState(false);
   const ref = useRef(null);
 
+  // закрытие выпадающего меню при клике вне его
   useEffect(() => {
     const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     document.addEventListener('mousedown', h);
     return () => document.removeEventListener('mousedown', h);
   }, []);
 
+  // функция для определения активной ссылки в навигации
   const active = (href) => `${s.link} ${path === href ? s.linkActive : ''}`;
 
+  // обработчик выхода из аккаунта, который вызывает функцию logout из контекста и перенаправляет на главную страницу
   const handleLogout = () => { logout(); setOpen(false); router.push('/'); };
 
   return (

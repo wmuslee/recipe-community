@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Recipe = require('../models/Recipe');
 const { protect } = require('../middleware/protect');
 
+// GET /api/users/:id отдаем данные юзера по id, включая количество рецептов, которые он создал, если юзер не найден - 404
 router.get('/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select('-password -savedRecipes');
@@ -13,6 +14,7 @@ router.get('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+// GET /api/users/:id/saved для авторизованных юзеров, отдаем сохраненные рецепты юзера по id, если юзер не найден - 404, если юзер запрашивает не свои сохраненные рецепты - 403
 router.get('/:id/saved', protect, async (req, res) => {
   try {
     if (req.user._id.toString() !== req.params.id)

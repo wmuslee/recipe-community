@@ -3,7 +3,7 @@ const router = express.Router();
 const Comment = require('../models/Comment');
 const { protect } = require('../middleware/protect');
 
-// GET /api/comments/:recipeId
+// GET /api/comments/:recipeId отдаем все комментарии к рецепту, сортируем по дате создания (новые первыми), добавляем данные авторов комментариев (username и avatar)
 router.get('/:recipeId', async (req, res) => {
   try {
     const comments = await Comment.find({ recipe: req.params.recipeId })
@@ -13,7 +13,7 @@ router.get('/:recipeId', async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// POST /api/comments/:recipeId
+// POST /api/comments/:recipeId для авторизованных юзеров, создаем комментарий к рецепту, отдаем его с данными автора (username и avatar)
 router.post('/:recipeId', protect, async (req, res) => {
   try {
     const { text } = req.body;
@@ -24,7 +24,7 @@ router.post('/:recipeId', protect, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// PUT /api/comments/:id
+// PUT /api/comments/:id для авторов комментариев, обновляем текст комментария, ставим флаг isEdited в true, отдаем обновленный комментарий с данными автора (username и avatar)
 router.put('/:id', protect, async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);
@@ -39,7 +39,7 @@ router.put('/:id', protect, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// DELETE /api/comments/:id
+// DELETE /api/comments/:id для авторов комментариев и админов, удаляем комментарий, отдаем сообщение об удалении и id удаленного комментария
 router.delete('/:id', protect, async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);
@@ -51,7 +51,7 @@ router.delete('/:id', protect, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// POST /api/comments/:id/like
+// POST /api/comments/:id/like для авторизованных юзеров, если юзер уже лайкнул комментарий - убираем лайк, если не лайкнул - ставим лайк, отдаем количество лайков и флаг, поставил ли юзер лайк
 router.post('/:id/like', protect, async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);

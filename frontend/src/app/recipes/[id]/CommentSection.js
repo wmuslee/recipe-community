@@ -19,20 +19,26 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
   const [likes, setLikes] = useState(initialLikes);
   const [saved, setSaved] = useState(false);
 
+  // обработчики для обновления комментариев и онлайн пользователей в реальном времени
   const onCommentAdded = useCallback(c => {
     setComments(prev => prev.some(x => x._id === c._id) ? prev : [c, ...prev]);
   }, []);
+  // обработчик для удаления комментария из списка при его удалении
   const onCommentDeleted = useCallback(id => setComments(prev => prev.filter(c => c._id !== id)), []);
+  // обработчик для обновления списка онлайн пользователей и их количества
   const onOnlineUsers = useCallback((users, count) => { setOnline(users); setOnlineCount(count); }, []);
 
+  // инициализация WebSocket соединения для получения обновлений комментариев и онлайн пользователей
   const { broadcastNewComment, broadcastDeleteComment } = useRecipeWS({
     recipeId, onCommentAdded, onCommentDeleted, onOnlineUsers,
   });
 
+  // загрузка комментариев при монтировании компонента
   useEffect(() => {
     commentsAPI.getByRecipe(recipeId).then(setComments).catch(() => {}).finally(() => setLoading(false));
   }, [recipeId]);
 
+  // обработчик отправки формы для создания нового комментария
   const submit = async e => {
     e.preventDefault();
     if (!text.trim() || submitting) return;
@@ -46,6 +52,7 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
     finally { setSubmitting(false); }
   };
 
+  // обработчик для удаления комментария
   const del = async id => {
     if (!confirm('Delete this comment?')) return;
     try {
@@ -55,6 +62,7 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
     } catch (err) { alert(err.message); }
   };
 
+  // обработчик для сохранения отредактированного комментария
   const saveEdit = async id => {
     if (!editText.trim()) return;
     try {
@@ -64,6 +72,7 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
     } catch (err) { alert(err.message); }
   };
 
+  // обработчик для лайка/дизлайка рецепта
   const handleLike = async () => {
     if (!user) return;
     try {
@@ -72,6 +81,7 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
     } catch {}
   };
 
+  // обработчик для сохранения/удаления рецепта из сохраненных
   const handleSave = async () => {
     if (!user) return;
     try {
@@ -80,6 +90,7 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
     } catch {}
   };
 
+  // обработчик для лайка/дизлайка комментария
   const likeComment = async id => {
     if (!user) return;
     try {

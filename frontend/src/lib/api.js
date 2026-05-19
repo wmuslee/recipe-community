@@ -1,5 +1,6 @@
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+// универсальная функция для выполнения API-запросов с обработкой токена и ошибок
 export async function apiFetch(path, options = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('rc_token') : null;
   const headers = {
@@ -13,6 +14,7 @@ export async function apiFetch(path, options = {}) {
   return data;
 }
 
+// набор API-функций для аутентификации, работы с рецептами, комментариями, категориями, тегами и пользователями
 export const authAPI = {
   register: (b) => apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify(b) }),
   login: (b) => apiFetch('/api/auth/login', { method: 'POST', body: JSON.stringify(b) }),
@@ -20,6 +22,7 @@ export const authAPI = {
   updateProfile: (b) => apiFetch('/api/auth/profile', { method: 'PUT', body: JSON.stringify(b) }),
 };
 
+// API-функции для работы с рецептами, получение всех рецептов с фильтрацией, получение одного рецепта по ID, создание, обновление, удаление, лайк и сохранение рецепта,получение рецептов по пользователю
 export const recipesAPI = {
   getAll: (p = {}) => apiFetch(`/api/recipes?${new URLSearchParams(p)}`),
   getOne: (id) => apiFetch(`/api/recipes/${id}`),
@@ -31,6 +34,7 @@ export const recipesAPI = {
   byUser: (uid) => apiFetch(`/api/recipes/user/${uid}`),
 };
 
+// API-функции для работы с комментариями, включая получение комментариев по рецепту, создание, обновление, удаление и лайк комментария
 export const commentsAPI = {
   getByRecipe: (rid) => apiFetch(`/api/comments/${rid}`),
   create: (rid, b) => apiFetch(`/api/comments/${rid}`, { method: 'POST', body: JSON.stringify(b) }),
@@ -39,6 +43,7 @@ export const commentsAPI = {
   like: (id) => apiFetch(`/api/comments/${id}/like`, { method: 'POST' }),
 };
 
+// API-функции для получения всех категорий и тегов, создания нового тега, а также получения профиля пользователя и его сохраненных рецептов
 export const categoriesAPI = { getAll: () => apiFetch('/api/categories') };
 export const tagsAPI = {
   getAll: () => apiFetch('/api/tags'),

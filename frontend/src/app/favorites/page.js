@@ -12,8 +12,10 @@ export default function FavoritesPage() {
   const [saved, setSaved] = useState([]);
   const [fetching, setFetching] = useState(true);
 
+  // перенаправление на страницу входа, если пользователь не авторизован
   useEffect(() => { if (!loading && !user) router.push('/auth/login'); }, [user, loading, router]);
 
+  // загрузка сохраненных рецептов при входе пользователя
   useEffect(() => {
     if (user) {
       usersAPI.getSaved(user._id)
@@ -23,6 +25,7 @@ export default function FavoritesPage() {
     }
   }, [user]);
 
+  // функция для удаления рецепта из сохраненных
   const unsave = async (id) => {
     try {
       await recipesAPI.save(id); // toggles

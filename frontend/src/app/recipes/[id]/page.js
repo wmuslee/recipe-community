@@ -5,6 +5,7 @@ import s from './recipe.module.css';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+// функция для получения данных рецепта по ID
 async function getRecipe(id) {
   try {
     const r = await fetch(`${API}/api/recipes/${id}`, { next: { revalidate: 0 } });
@@ -13,6 +14,7 @@ async function getRecipe(id) {
   } catch { return null; }
 }
 
+// страница с подробной информацией о рецепте, его ингредиентами, инструкциями и комментариями
 export default async function RecipePage({ params }) {
   const recipe = await getRecipe(params.id);
   if (!recipe) notFound();
