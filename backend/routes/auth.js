@@ -4,7 +4,7 @@ const User = require('../models/User');
 const { generateToken } = require('../utils/generateToken');
 const { protect } = require('../middleware/protect');
 
-// POST /api/auth/register  проверка на поля, если все гуд - создаем юзера, генерируем токен и отдаем юзера с токеном
+// POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -23,7 +23,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// POST /api/auth/login проверка на поля, если все гуд - ищем юзера по email, если юзер найден и пароль совпал - генерируем токен и отдаем юзера с токеном
+// POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
