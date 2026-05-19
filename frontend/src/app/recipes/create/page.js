@@ -56,7 +56,6 @@ export default function CreateRecipePage() {
         {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={onSubmit}>
 
-          {/* Basic info */}
           <div className={s.card}>
             <h2>Basic Information</h2>
             <div className="form-group"><label>Title *</label><input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="E.g. Creamy Pasta Carbonara" required/></div>
@@ -77,7 +76,6 @@ export default function CreateRecipePage() {
               </select>
             </div>
 
-            {/* Recipe image — UploadThing type 1 */}
             <div className="form-group">
               <label>Recipe Photo</label>
               {image ? (
@@ -96,7 +94,6 @@ export default function CreateRecipePage() {
             </div>
           </div>
 
-          {/* Tags */}
           {allTags.length>0 && (
             <div className={s.card}><h2>Tags</h2>
               <div className={s.tagGrid}>
@@ -110,7 +107,6 @@ export default function CreateRecipePage() {
             </div>
           )}
 
-          {/* Ingredients */}
           <div className={s.card}><h2>Ingredients *</h2>
             {ings.map((ing,i)=>(
               <div key={i} className={s.ingRow}>
@@ -123,7 +119,6 @@ export default function CreateRecipePage() {
             <button type="button" className="btn btn-ghost btn-sm" onClick={addIng}>+ Add Ingredient</button>
           </div>
 
-          {/* Instructions */}
           <div className={s.card}><h2>Instructions *</h2>
             {steps.map((st,i)=>(
               <div key={i} className={s.stepRow}>
