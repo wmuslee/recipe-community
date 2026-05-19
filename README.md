@@ -6,7 +6,7 @@
 - **Health Check:** https://recipe-community-backend.onrender.com/api/health
 
 ## 🎥 Video Demo
-[Watch Demo](https://ссылка-на-твоё-видео)
+[Watch Demo](https://youtu.be/qmydGNgF33E)
 
 ## ⚙️ Setup & Installation
 

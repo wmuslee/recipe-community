@@ -28,12 +28,34 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
   // обработчик для обновления списка онлайн пользователей и их количества
   const onOnlineUsers = useCallback((users, count) => { setOnline(users); setOnlineCount(count); }, []);
 
-  // инициализация WebSocket соединения для получения обновлений комментариев и онлайн пользователей
-  const { broadcastNewComment, broadcastDeleteComment } = useRecipeWS({
-    recipeId, onCommentAdded, onCommentDeleted, onOnlineUsers,
-  });
+  const onCommentUpdated = useCallback((updatedComment) => {
+    setComments(prev => prev.map(c => c._id === updatedComment._id ? updatedComment : c));
+  }, []);
 
-  // загрузка комментариев при монтировании компонента
+  const onCommentLiked = useCallback((commentId, likesCount, isLiked, userId) => {
+    setComments(prev => prev.map(c => {
+      if (c._id !== commentId) return c;
+      const likes = isLiked
+        ? [...(c.likes || []), userId]
+        : (c.likes || []).filter(id => id !== userId);
+      return { ...c, likes };
+    }));
+  }, []);
+
+  useEffect(() => {
+  return () => {
+    console.log('Leaving recipe room:', recipeId);
+  };
+}, [recipeId]);
+
+  const { broadcastNewComment, broadcastDeleteComment, broadcastUpdateComment, broadcastLikeComment } = useRecipeWS({
+    recipeId,
+    onCommentAdded,
+    onCommentDeleted,
+    onOnlineUsers,
+    onCommentUpdated,
+    onCommentLiked,
+  });
   useEffect(() => {
     commentsAPI.getByRecipe(recipeId).then(setComments).catch(() => {}).finally(() => setLoading(false));
   }, [recipeId]);
@@ -68,8 +90,9 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
     try {
       const updated = await commentsAPI.update(id, { text: editText });
       setComments(prev => prev.map(c => c._id === id ? updated : c));
+      broadcastUpdateComment(updated); 
       setEditId(null);
-    } catch (err) { alert(err.message); }
+    } catch(err) { alert(err.message); }
   };
 
   // обработчик для лайка/дизлайка рецепта
@@ -96,9 +119,12 @@ export default function CommentSection({ recipeId, authorId, initialLikes }) {
     try {
       const d = await commentsAPI.like(id);
       setComments(prev => prev.map(c => c._id === id
-        ? { ...c, likes: d.isLiked ? [...(c.likes||[]), user._id] : (c.likes||[]).filter(x => x !== user._id) }
+        ? { ...c, likes: d.isLiked
+            ? [...(c.likes || []), user._id]
+            : (c.likes || []).filter(x => x !== user._id) }
         : c
       ));
+      broadcastLikeComment(id, d.likesCount, d.isLiked, user._id); 
     } catch {}
   };
 
